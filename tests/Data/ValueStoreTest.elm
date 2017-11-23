@@ -3,7 +3,7 @@ module Data.ValueStoreTest exposing (..)
 import Test exposing (..)
 import Expect exposing (Expectation)
 import Dict exposing (Dict)
-import Data.ValueStore exposing (ValueStore, emptyStore, registerValue, Value(..))
+import Data.ValueStore exposing (emptyStore, registerValue, Value(..))
 
 
 suite : Test
@@ -16,7 +16,7 @@ suite =
                         store =
                             emptyStore
                     in
-                        emptyStore
+                        store
                             |> Expect.equal Dict.empty
             ]
         , describe "registerValue"

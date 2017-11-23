@@ -19,6 +19,7 @@ type alias ValueStore =
     Dict String Value
 
 
+emptyStore : ValueStore
 emptyStore =
     Dict.empty
 

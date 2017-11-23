@@ -1,25 +1,33 @@
-module View.ValueStore exposing (..)
+module View.ValueStore exposing (valueStore)
 
-import Element exposing (..)
-import Element.Attributes exposing (..)
-import Element.Input as Input
+import Html.Styled exposing (Html, Attribute, div, text, input)
+import Html.Styled.Events exposing (onInput, on, keyCode)
+import Html.Styled.Attributes exposing (value)
+import Msg.Main as Main exposing (Msg(..))
+import Msg.ValueStore exposing (Msg(..))
 import Model.ValueStore exposing (Model)
-import Msg.Main as Main exposing (..)
-import Msg.ValueStore exposing (..)
-import Styling exposing (Styles(..))
+import Json.Decode as Json
 
 
-valueStore : Model -> Element Styles variation Main.Msg
+onKeyDown : (Int -> msg) -> Attribute msg
+onKeyDown tagger =
+    on "keydown" (Json.map tagger keyCode)
+
+
+valueStore : Model -> Html Main.Msg
 valueStore model =
-    column MetaPage
-        [ padding 10 ]
-        [ Input.text
-            None
-            []
-            { onChange = (MsgForValueStore << UpdateInput)
-            , value = model.input
-            , label = Input.hiddenLabel "Input"
-            , options = []
-            }
+    div []
+        [ inputField model.input
         , text model.input
+        , text model.error
         ]
+
+
+inputField : String -> Html Main.Msg
+inputField text =
+    input
+        [ value text
+        , onInput (MsgForValueStore << UpdateInput)
+        , onKeyDown (MsgForValueStore << KeyDown)
+        ]
+        []
