@@ -12,7 +12,7 @@ import Dict exposing (Dict)
 type Value
     = IntValue Int
     | StringValue String
-    | EmptyValue
+    | ListValue (List Value)
 
 
 type alias ValueStore =

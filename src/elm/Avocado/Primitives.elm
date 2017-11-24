@@ -30,4 +30,7 @@ identifier =
 
 valid_string : Parser String
 valid_string =
-    keep zeroOrMore (\c -> c /= '"')
+    succeed identity
+        |. symbol "\""
+        |= keep zeroOrMore (\c -> c /= '"')
+        |. symbol "\""

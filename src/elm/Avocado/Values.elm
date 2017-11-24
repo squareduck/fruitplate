@@ -1,6 +1,23 @@
 module Avocado.Values exposing (..)
 
-import Parser exposing (Parser, (|.), (|=), delayedCommit, succeed, oneOf, symbol, int, float, keyword, end, keep, ignore, zeroOrMore)
+import Parser
+    exposing
+        ( Parser
+        , (|.)
+        , (|=)
+        , delayedCommit
+        , andThen
+        , succeed
+        , oneOf
+        , symbol
+        , int
+        , float
+        , keyword
+        , end
+        , keep
+        , ignore
+        , zeroOrMore
+        )
 import Data.ValueStore exposing (ValueStore, Value(..), registerValue)
 import Avocado.Primitives exposing (spaces, any, valid_string)
 
@@ -10,7 +27,7 @@ import Avocado.Primitives exposing (spaces, any, valid_string)
 
 typedValue : Parser Value
 typedValue =
-    delayedCommit (keyword ":") <|
+    delayedCommit (symbol ":") <|
         succeed identity
             |. spaces
             |= oneOf
@@ -21,12 +38,13 @@ typedValue =
 
 inferredValue : Parser Value
 inferredValue =
-    delayedCommit (keyword "=") <|
+    delayedCommit (symbol "=") <|
         succeed identity
             |. spaces
             |= oneOf
                 [ intValue
                 , stringValue
+                , listValue
                 ]
 
 
@@ -38,8 +56,6 @@ intValue : Parser Value
 intValue =
     succeed IntValue
         |= int
-        |. spaces
-        |. end
 
 
 typedIntValue : Parser Value
@@ -47,11 +63,9 @@ typedIntValue =
     succeed IntValue
         |. keyword "Int"
         |. spaces
-        |. keyword "="
+        |. symbol "="
         |. spaces
         |= int
-        |. spaces
-        |. end
 
 
 
@@ -61,11 +75,7 @@ typedIntValue =
 stringValue : Parser Value
 stringValue =
     succeed StringValue
-        |. symbol "\""
         |= valid_string
-        |. symbol "\""
-        |. spaces
-        |. end
 
 
 typedStringValue : Parser Value
@@ -73,10 +83,73 @@ typedStringValue =
     succeed StringValue
         |. keyword "String"
         |. spaces
-        |. keyword "="
+        |. symbol "="
         |. spaces
-        |. symbol "\""
         |= valid_string
-        |. symbol "\""
+
+
+
+-- List
+
+
+listValue : Parser Value
+listValue =
+    delayedCommit (symbol "[") <|
+        succeed identity
+            |. spaces
+            |= oneOf
+                [ listIntValue
+                , listStringValue
+                ]
+
+
+listIntValue : Parser Value
+listIntValue =
+    succeed ListValue
+        |= andThen (\n -> intAccumulator [ n ]) intValue
         |. spaces
-        |. end
+        |. symbol "]"
+
+
+intAccumulator : List Value -> Parser (List Value)
+intAccumulator revValues =
+    oneOf
+        [ nextIntValue
+            |> andThen (\n -> intAccumulator (n :: revValues))
+        , succeed (List.reverse revValues)
+        ]
+
+
+nextIntValue : Parser Value
+nextIntValue =
+    delayedCommit spaces <|
+        succeed IntValue
+            |. symbol ","
+            |. spaces
+            |= int
+
+
+listStringValue : Parser Value
+listStringValue =
+    succeed ListValue
+        |= andThen (\n -> stringAccumulator [ n ]) stringValue
+        |. spaces
+        |. symbol "]"
+
+
+stringAccumulator : List Value -> Parser (List Value)
+stringAccumulator revValues =
+    oneOf
+        [ nextStringValue
+            |> andThen (\n -> stringAccumulator (n :: revValues))
+        , succeed (List.reverse revValues)
+        ]
+
+
+nextStringValue : Parser Value
+nextStringValue =
+    delayedCommit spaces <|
+        succeed StringValue
+            |. symbol ","
+            |. spaces
+            |= valid_string

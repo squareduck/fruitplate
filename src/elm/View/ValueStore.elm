@@ -116,8 +116,8 @@ valueBlockColor value =
         StringValue _ ->
             hex "E0DCEF"
 
-        _ ->
-            hex "333333"
+        ListValue _ ->
+            hex "EFEEDC"
 
 
 valueToStringTuple : Data.ValueStore.Value -> ( String, String )
@@ -129,8 +129,8 @@ valueToStringTuple value =
         StringValue content ->
             ( "String", content )
 
-        _ ->
-            ( "Unknown", "Unknown" )
+        ListValue content ->
+            ( "List", toString content )
 
 
 valueBlock : ( String, Data.ValueStore.Value ) -> Html Main.Msg

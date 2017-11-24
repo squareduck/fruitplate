@@ -3,7 +3,7 @@ module Avocado.ValuesTest exposing (..)
 import Test exposing (..)
 import Expect exposing (Expectation)
 import Dict exposing (Dict)
-import Avocado exposing (parseExpression)
+import Avocado.Main exposing (parseExpression)
 import Data.ValueStore exposing (emptyStore, Value(..))
 
 
@@ -25,7 +25,9 @@ suite =
                                 Err err ->
                                     store
                     in
-                        Expect.equal (Dict.get "num" result) (Just (IntValue 123))
+                        Expect.equal
+                            (Dict.get "num" result)
+                            (Just (IntValue 123))
             ]
         , describe "Inferred value assignment"
             [ test "'num = 123' puts value into store" <|
@@ -42,6 +44,8 @@ suite =
                                 Err err ->
                                     store
                     in
-                        Expect.equal (Dict.get "num" result) (Just (IntValue 123))
+                        Expect.equal
+                            (Dict.get "num" result)
+                            (Just (IntValue 123))
             ]
         ]
