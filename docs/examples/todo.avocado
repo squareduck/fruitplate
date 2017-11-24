@@ -1,0 +1,36 @@
+; Basic Todo application example with full type specifications
+; Most of these type specs should be inferred automatically
+
+; Schemas
+Task: Schema = id Id, name String, done Boolean, tags List String, project_id Id
+Project: Schema = id Id, name String, description String
+
+; Values
+tasks: List Record(Task) = []
+projects: List Record(Project) = [{name: "General", description: "Default project"}]
+current_project: Id = @projects | one($.name == "General")
+
+; Transforms
+completed: Transform(List Record(done Any, *) -> List Record(done Any, *)) = where($.done)
+incomplete: Transform(List Record(done Any, *) -> List Record(done Any, *)) = where(not $.done)
+in_current_project: Transform(List Record(project_id Id, *) -> List Record(project_id Id, *)) = where($.project_id == @current_project)
+
+; Pipelines
+todo_in_current_project: Pipeline(List Record(done Any, project_id Id, *) -> List Record(done Any, project_id Id, *)) = in_current_project | incomplete
+
+; Actions
+pick_project: Action = select(projects | field($.id), names: projects | field($.name), store: current_project)
+toggle_task: Action = checkbox(>>, change: change(not $.done, field: "done"))
+
+; Components
+; TODO
+; - Container components?
+; - Creating components from transform output?
+todolist: Component = list(todo_in_current_project, actions: pick_project, elements: list_entry)
+list_entry: Component = span(>>, actions)
+
+; Pages
+; TODO
+; - Concept of pages
+; - How to define layout?
+; - Main page to start app execution

@@ -4,15 +4,20 @@ Avocado is a small strongly typed declarative language for describing Fruitplate
 
 ## Value types
 
+Any - Special type when we only care about value being present
+Id - Can be ommited in value literal and will be automatically generated as UUID
 Bool
 Int
 Float
+String
 List a
 Record(a)
+Enum
 
 ## Defining basic values
 
 Value type can be inferred if type is missing
+Value must be initialized
 
 Defining values
 ```

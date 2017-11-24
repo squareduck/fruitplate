@@ -1,7 +1,7 @@
 module Model.ValueStore exposing (..)
 
 import Data.ValueStore exposing (ValueStore, emptyStore)
-import Avocado exposing (parseLine)
+import Avocado.Main exposing (parseExpression)
 
 
 type alias Model =
@@ -13,12 +13,12 @@ type alias Model =
 
 evaluateInput : Model -> Model
 evaluateInput model =
-    case parseLine model.input model.store of
+    case parseExpression model.input model.store of
         Ok store ->
             { model | store = store, error = "", input = "" }
 
         Err msg ->
-            { model | error = msg }
+            { model | error = toString msg.problem }
 
 
 initialModel : Model

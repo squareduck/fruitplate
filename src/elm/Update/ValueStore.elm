@@ -1,7 +1,6 @@
 module Update.ValueStore exposing (..)
 
 import Model.ValueStore exposing (Model, evaluateInput)
-import Msg.Main as Main exposing (..)
 import Msg.ValueStore as ValueStore exposing (..)
 
 
