@@ -4,7 +4,7 @@ import Dict exposing (Dict)
 import Css exposing (..)
 import Html.Styled exposing (Html, Attribute, div, text, input)
 import Html.Styled.Events exposing (onInput, on, keyCode)
-import Html.Styled.Attributes exposing (value, css)
+import Html.Styled.Attributes exposing (value, css, autofocus)
 import Msg.Main as Main exposing (Msg(..))
 import Msg.ValueStore exposing (Msg(..))
 import Model.ValueStore exposing (Model)
@@ -41,6 +41,7 @@ inputField text =
         [ value text
         , onInput (MsgForValueStore << UpdateInput)
         , onKeyUp (MsgForValueStore << KeyDown)
+        , autofocus True
         , css
             [ padding (px 10)
             , borderWidth (px 1)

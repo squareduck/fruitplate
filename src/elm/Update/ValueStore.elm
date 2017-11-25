@@ -15,5 +15,8 @@ update msg model =
                 13 ->
                     evaluateInput model
 
+                27 ->
+                    { model | input = "" }
+
                 _ ->
                     model

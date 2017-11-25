@@ -6,7 +6,7 @@
   "scripts": {
     "server": "webpack-dev-server --content-base /dist",
     "start": "electron ./src/static/main.js",
-    "test": "elm-test"
+    "test": "elm-test --watch"
   },
   "author": "Daniil Velichko <danvelduck@gmail.com>",
   "license": "ISC",

@@ -6,6 +6,7 @@ import Parser
         , (|.)
         , (|=)
         , delayedCommit
+        , lazy
         , andThen
         , succeed
         , oneOf
@@ -94,21 +95,46 @@ typedStringValue =
 
 listValue : Parser Value
 listValue =
-    delayedCommit (symbol "[") <|
-        succeed identity
-            |. spaces
-            |= oneOf
-                [ listIntValue
-                , listStringValue
-                ]
-
-
-listIntValue : Parser Value
-listIntValue =
     succeed ListValue
-        |= andThen (\n -> intAccumulator [ n ]) intValue
+        |. symbol "["
+        |. spaces
+        |= oneOf
+            [ listIntValue
+            , listStringValue
+            , lazy (\_ -> listListValue)
+            ]
         |. spaces
         |. symbol "]"
+
+
+listListValue : Parser (List Value)
+listListValue =
+    succeed identity
+        |= andThen (\l -> listAccumulator [ l ]) listValue
+
+
+listAccumulator : List Value -> Parser (List Value)
+listAccumulator revValues =
+    oneOf
+        [ nextListValue
+            |> andThen (\l -> listAccumulator (l :: revValues))
+        , succeed (List.reverse revValues)
+        ]
+
+
+nextListValue : Parser Value
+nextListValue =
+    delayedCommit spaces <|
+        succeed identity
+            |. symbol ","
+            |. spaces
+            |= lazy (\_ -> listValue)
+
+
+listIntValue : Parser (List Value)
+listIntValue =
+    succeed identity
+        |= andThen (\n -> intAccumulator [ n ]) intValue
 
 
 intAccumulator : List Value -> Parser (List Value)
@@ -129,12 +155,10 @@ nextIntValue =
             |= int
 
 
-listStringValue : Parser Value
+listStringValue : Parser (List Value)
 listStringValue =
-    succeed ListValue
+    succeed identity
         |= andThen (\n -> stringAccumulator [ n ]) stringValue
-        |. spaces
-        |. symbol "]"
 
 
 stringAccumulator : List Value -> Parser (List Value)
