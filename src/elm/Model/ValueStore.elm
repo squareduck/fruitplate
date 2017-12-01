@@ -23,7 +23,7 @@ evaluateInput model =
 
 initialModel : Model
 initialModel =
-    { input = "num: Int = 123"
+    { input = "num = 123"
     , error = ""
     , store = emptyStore
     }

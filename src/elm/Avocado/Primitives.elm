@@ -26,11 +26,3 @@ identifier =
     succeed (++)
         |= keep zeroOrMore (\c -> Char.isUpper c || Char.isLower c || c == '_')
         |= keep zeroOrMore (\c -> Char.isUpper c || Char.isLower c || c == '_' || Char.isDigit c)
-
-
-valid_string : Parser String
-valid_string =
-    succeed identity
-        |. symbol "\""
-        |= keep zeroOrMore (\c -> c /= '"')
-        |. symbol "\""

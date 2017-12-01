@@ -111,7 +111,10 @@ fuzzySort text store =
 valueBlockColor : Data.ValueStore.Value -> Css.Color
 valueBlockColor value =
     case value of
-        IntValue _ ->
+        BoolValue _ ->
+            hex "E6F5E3"
+
+        NumberValue _ ->
             hex "E3EEF5"
 
         StringValue _ ->
@@ -124,8 +127,16 @@ valueBlockColor value =
 valueToStringTuple : Data.ValueStore.Value -> ( String, String )
 valueToStringTuple value =
     case value of
-        IntValue content ->
-            ( "Int", toString content )
+        BoolValue content ->
+            ( "Bool"
+            , if content == True then
+                "true"
+              else
+                "false"
+            )
+
+        NumberValue content ->
+            ( "Number", toString content )
 
         StringValue content ->
             ( "String", content )
@@ -136,6 +147,21 @@ valueToStringTuple value =
 
 valueBlock : ( String, Data.ValueStore.Value ) -> Html Main.Msg
 valueBlock ( name, value ) =
+    case value of
+        ListValue content ->
+            listValueBlock name content
+
+        _ ->
+            basicValueBlock name value
+
+
+listValueBlock : String -> ( String, List Data.ValueStore.Value ) -> Html Main.Msg
+listValueBlock name ( typestring, content ) =
+    div [] [ text "list block " ]
+
+
+basicValueBlock : String -> Data.ValueStore.Value -> Html Main.Msg
+basicValueBlock name value =
     let
         ( value_type, value_content ) =
             valueToStringTuple (value)
